@@ -297,10 +297,10 @@ def main(args):
             src = load_file_pd(f)
             ref, src = interpolation(ref,src)
             keypoints = find_common_keypoints(ref,src)
+            print(keypoints)
             accel = compute_error_accel(ref,src,keypoints)
             mpjpe,pampjpe = calculate_mpjpe(ref,src,keypoints)
             list_values.append([mpjpe*1000,accel*1000])
-    #print(np.mean(np.array(list_values),axis=0))  
     print(np.round(np.mean(np.array(list_values),axis=0),2))
 
 if __name__ == '__main__':

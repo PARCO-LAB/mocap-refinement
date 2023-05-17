@@ -8,53 +8,67 @@ from timeit import default_timer as timer
 # ------------------------------------------------------------------------------------------------------------------
 
 # Sometimes is necessary to have a pre processing step (before runtime)
-def pre_process():
-    pass
+def pre_process(delta):
+    #w = [1/delta]*delta
+    w = list(range(1,int(delta/2)+1))+list(range(int(delta/2),0,-1))
+    s = sum(w)
+    w = [e/s for e in w]
+    return w
 
 # Called at each time-step:
 # - skeleton is a list of values containing the coordinates [X,Y,Z] of each joint in row ( e.g. [1 5 2 6 7 1 ...] ).
 # - time is a float expressed in seconds
 # - history are all the past values of skeleton, so it's a table
-def SMA(skeleton):
+def WMA(skeleton,w):
     out = []
     for i in range(len(skeleton[1])):
         col = [p[i] for p in skeleton]
-        out.append(sum(col)/len(col))
+        out.append(sum([a*b for a,b in zip(col,w)]))
+        #out.append(sum(col)/len(col))
+    
     return out
 
 # Perform some operations at the end of the time frames
 def post_process():
     pass
 
+
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
-def routine(table, time, names,delta):
+def routine(table, time, names, delta):
     
     out = []
     
     # Pre-process phase
     start_pre = timer()
     # ------------------------------------------------------------------------------------------------------------------
-    pre_process()
+    weights = pre_process(delta)
+    
     # ------------------------------------------------------------------------------------------------------------------
     end_pre = timer()
 
     # Runtime phase
     start_run = timer()
     # ------------------------------------------------------------------------------------------------------------------
+    
+
+
     for i in range(0,len(time)):
         if i < delta/2 or i > len(time)-(delta/2):
             out.append(table[i])
         else:
-            out.append(SMA(table[i-int(delta/2):i+int(delta/2)]))
+            out.append(WMA(table[i-int(delta/2):i+int(delta/2)], weights))
+    
     # ------------------------------------------------------------------------------------------------------------------
     end_run = timer()
 
     # Post processing phase
     start_post = timer()
     # ------------------------------------------------------------------------------------------------------------------
+    
     post_process()
+    
     # ------------------------------------------------------------------------------------------------------------------
     end_post = timer()
 
@@ -65,6 +79,7 @@ def routine(table, time, names,delta):
     tot_time = round((pre_time+run_time+post_time),2)
     print("INFO:\tkps:",kps_num,"\tframes:",len(out),"\tdelay:", round(tot_time/len(out),3) ,"ms")    
     print("TIME ELAPSED:\tpre:",round(end_pre-start_pre,5)*1000,"ms\trun:",round(end_run-start_run,5)*1000,"ms\tpost:",round(end_post-start_post,5)*1000,"ms")
+
     return out
 
 # Parse argument if passed directly from viewer.py
@@ -85,6 +100,7 @@ def main():
     #output_path = input_path.replace("input","output/"+filter_name)
     output_path = f+"/"+file_name
     viewer.write_table(output_path,table_out, time, names)
+
 
 if __name__ == "__main__":
     main()

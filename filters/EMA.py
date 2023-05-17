@@ -15,46 +15,58 @@ def pre_process():
 # - skeleton is a list of values containing the coordinates [X,Y,Z] of each joint in row ( e.g. [1 5 2 6 7 1 ...] ).
 # - time is a float expressed in seconds
 # - history are all the past values of skeleton, so it's a table
-def SMA(skeleton):
-    out = []
-    for i in range(len(skeleton[1])):
-        col = [p[i] for p in skeleton]
-        out.append(sum(col)/len(col))
-    return out
+def EMA(skeleton, alpha, prec):
+    val = [e*alpha for e in skeleton]
+    valold = [(1-alpha)*e for e in prec]
+    return [val[i] + valold[i] for i in range(0,len(val))] 
+    
+       
 
 # Perform some operations at the end of the time frames
 def post_process():
     pass
 
+
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
-def routine(table, time, names,delta):
+def routine(table, time, names):
     
     out = []
     
     # Pre-process phase
     start_pre = timer()
     # ------------------------------------------------------------------------------------------------------------------
+    
     pre_process()
+    
     # ------------------------------------------------------------------------------------------------------------------
     end_pre = timer()
 
     # Runtime phase
     start_run = timer()
     # ------------------------------------------------------------------------------------------------------------------
-    for i in range(0,len(time)):
-        if i < delta/2 or i > len(time)-(delta/2):
-            out.append(table[i])
-        else:
-            out.append(SMA(table[i-int(delta/2):i+int(delta/2)]))
+    
+    alpha = 0.5
+    prec = table[0]
+    out.append(prec)
+    for i in range(1,len(time)):
+        prec = EMA(table[i], alpha, prec)
+        out.append(prec)
+    
+ #   print(len(table), len(out))
+    
+    
     # ------------------------------------------------------------------------------------------------------------------
     end_run = timer()
 
     # Post processing phase
     start_post = timer()
     # ------------------------------------------------------------------------------------------------------------------
+    
     post_process()
+    
+    
     # ------------------------------------------------------------------------------------------------------------------
     end_post = timer()
 
@@ -65,6 +77,7 @@ def routine(table, time, names,delta):
     tot_time = round((pre_time+run_time+post_time),2)
     print("INFO:\tkps:",kps_num,"\tframes:",len(out),"\tdelay:", round(tot_time/len(out),3) ,"ms")    
     print("TIME ELAPSED:\tpre:",round(end_pre-start_pre,5)*1000,"ms\trun:",round(end_run-start_run,5)*1000,"ms\tpost:",round(end_post-start_post,5)*1000,"ms")
+
     return out
 
 # Parse argument if passed directly from viewer.py
@@ -80,11 +93,12 @@ def main():
       os.makedirs(f)
     table, time, names = viewer.get_table(input_path)
     # ------------------------------------------------------------------------------------------------------------------
-    table_out = routine(table, time, names,delta)
+    table_out = routine(table, time, names)
     # ------------------------------------------------------------------------------------------------------------------
     #output_path = input_path.replace("input","output/"+filter_name)
     output_path = f+"/"+file_name
     viewer.write_table(output_path,table_out, time, names)
+
 
 if __name__ == "__main__":
     main()

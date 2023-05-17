@@ -13,10 +13,11 @@ This repository includes implementation codes or links to the authors’ origina
 - ✅ Butterworth (BF)
 - ✅ Least Square Gaussian (LSG)
 - ✅ Savitzky–Golay (SG)
+- 🔄 Interpolation (INT)
 
 ### State Observers
 - ✅ Kalman Filter:
-    - ✅ with random walk motion model (KF)
+    - ✅ with random walk motion model (KF0)
     - ✅ 1th-order (KF1)
     - ✅ 2th-order (KF2)
 - 🔄 Extended Kalman Filter (EKF)
@@ -61,8 +62,8 @@ This repository includes implementation codes or links to the authors’ origina
 <tbody>
   <tr>
     <td>baseline</td>
-    <td></td>
-    <td></td>
+    <td>159.59</td>
+    <td>390.78</td>
     <td>-</td>
     <td>-</td>
     <td>-</td>
@@ -78,6 +79,123 @@ This repository includes implementation codes or links to the authors’ origina
     <td>-</td>
   </tr>
   <tr>
+    <td>WMA</td>
+    <td>44.77</td>
+    <td>12.68</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>EMA</td>
+    <td>92.83</td>
+    <td>145.66</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>HDE</td>
+    <td>105.88</td>
+    <td>156.72</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Butterworth</td>
+    <td>56.78</td>
+    <td>15.46</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Least-Squared</td>
+    <td>55.44</td>
+    <td>16.17</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Savitzky-Golay</td>
+    <td>74.08</td>
+    <td>49.99</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Interpolation</td>
+    <td>-</td>
+    <td>-</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>KF0</td>
+    <td>64.81</td>
+    <td>49.96</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>KF1</td>
+    <td>64.28</td>
+    <td>53.73</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>KF2</td>
+    <td>65.8</td>
+    <td>56.52</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>T-SVD</td>
+    <td>111.42</td>
+    <td>106.33</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+    <tr>
+    <td>PCA</td>
+    <td>-</td>
+    <td>-</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>KF+DE</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+    <tr>
     <td></td>
     <td></td>
     <td></td>

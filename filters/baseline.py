@@ -2,7 +2,7 @@ import sys,os
 sys.path.append(os.path.join(os.path.dirname(__file__),'..','utils'))
 import viewer
 from timeit import default_timer as timer
-
+import numpy as np
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
@@ -15,46 +15,53 @@ def pre_process():
 # - skeleton is a list of values containing the coordinates [X,Y,Z] of each joint in row ( e.g. [1 5 2 6 7 1 ...] ).
 # - time is a float expressed in seconds
 # - history are all the past values of skeleton, so it's a table
-def SMA(skeleton):
-    out = []
-    for i in range(len(skeleton[1])):
-        col = [p[i] for p in skeleton]
-        out.append(sum(col)/len(col))
-    return out
+def filter(skeleton,time,history):
+    return skeleton
 
 # Perform some operations at the end of the time frames
 def post_process():
     pass
 
+
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
-def routine(table, time, names,delta):
+def routine(table, time, names):
     
     out = []
     
     # Pre-process phase
     start_pre = timer()
     # ------------------------------------------------------------------------------------------------------------------
+    
     pre_process()
+    
     # ------------------------------------------------------------------------------------------------------------------
     end_pre = timer()
 
     # Runtime phase
     start_run = timer()
     # ------------------------------------------------------------------------------------------------------------------
+    
+    
     for i in range(0,len(time)):
-        if i < delta/2 or i > len(time)-(delta/2):
+        mask = np.isnan(table[i])
+        if np.any(mask):
+            table[i] = np.array(table[i-1])[mask].tolist()
             out.append(table[i])
-        else:
-            out.append(SMA(table[i-int(delta/2):i+int(delta/2)]))
+        else:    
+            out.append(filter(table[i],time[i],table[0:i]))
+    
+    
     # ------------------------------------------------------------------------------------------------------------------
     end_run = timer()
 
     # Post processing phase
     start_post = timer()
     # ------------------------------------------------------------------------------------------------------------------
+    
     post_process()
+    
     # ------------------------------------------------------------------------------------------------------------------
     end_post = timer()
 
@@ -80,7 +87,7 @@ def main():
       os.makedirs(f)
     table, time, names = viewer.get_table(input_path)
     # ------------------------------------------------------------------------------------------------------------------
-    table_out = routine(table, time, names,delta)
+    table_out = routine(table, time, names)
     # ------------------------------------------------------------------------------------------------------------------
     #output_path = input_path.replace("input","output/"+filter_name)
     output_path = f+"/"+file_name

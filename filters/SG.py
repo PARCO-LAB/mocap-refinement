@@ -2,6 +2,9 @@ import sys,os
 sys.path.append(os.path.join(os.path.dirname(__file__),'..','utils'))
 import viewer
 from timeit import default_timer as timer
+import numpy as np
+from scipy import signal
+import pandas as pd
 
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
@@ -15,46 +18,58 @@ def pre_process():
 # - skeleton is a list of values containing the coordinates [X,Y,Z] of each joint in row ( e.g. [1 5 2 6 7 1 ...] ).
 # - time is a float expressed in seconds
 # - history are all the past values of skeleton, so it's a table
-def SMA(skeleton):
+def SG(skeleton,delta):
     out = []
-    for i in range(len(skeleton[1])):
+
+    for i in range(len(skeleton[0])):
+        
         col = [p[i] for p in skeleton]
-        out.append(sum(col)/len(col))
-    return out
+        y = signal.savgol_filter(col, window_length=11, polyorder=3, mode="nearest")
+        out.append(y)
+
+    new_out = np.array(out).T.tolist()
+
+    return new_out
 
 # Perform some operations at the end of the time frames
 def post_process():
     pass
 
+
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
-def routine(table, time, names,delta):
-    
+def routine(table, time, names, delta):
+
     out = []
-    
+
     # Pre-process phase
     start_pre = timer()
     # ------------------------------------------------------------------------------------------------------------------
+
     pre_process()
+
     # ------------------------------------------------------------------------------------------------------------------
     end_pre = timer()
 
     # Runtime phase
     start_run = timer()
     # ------------------------------------------------------------------------------------------------------------------
-    for i in range(0,len(time)):
-        if i < delta/2 or i > len(time)-(delta/2):
-            out.append(table[i])
-        else:
-            out.append(SMA(table[i-int(delta/2):i+int(delta/2)]))
+    
+    for i in range(0,(len(time) - len(time) % delta), delta):
+        out[i:i+delta] = SG((table[i:i+delta]), delta)
+    if len(time)-len(time)%delta-len(time) != 0:
+        out[len(time)-len(time)%delta:len(time)] = SG((table[len(time)-len(time)%delta:len(time)]), delta)
+
     # ------------------------------------------------------------------------------------------------------------------
     end_run = timer()
 
     # Post processing phase
     start_post = timer()
     # ------------------------------------------------------------------------------------------------------------------
+
     post_process()
+
     # ------------------------------------------------------------------------------------------------------------------
     end_post = timer()
 
@@ -65,6 +80,7 @@ def routine(table, time, names,delta):
     tot_time = round((pre_time+run_time+post_time),2)
     print("INFO:\tkps:",kps_num,"\tframes:",len(out),"\tdelay:", round(tot_time/len(out),3) ,"ms")    
     print("TIME ELAPSED:\tpre:",round(end_pre-start_pre,5)*1000,"ms\trun:",round(end_run-start_run,5)*1000,"ms\tpost:",round(end_post-start_post,5)*1000,"ms")
+    
     return out
 
 # Parse argument if passed directly from viewer.py
