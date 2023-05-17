@@ -20,14 +20,14 @@ bones = {
     "LFoot" : ["LAnkle","LFoot"],
 }
 
-def write_results(out_name, mean_mae, std_mean_mae, mae, std_mae, mean_rmse, mean_std_rmse, rmse, pcc, keypoints):
-    pcc.to_csv(out_name + '_pcc.csv')
+def write_results(out_dir, mean_mae, std_mean_mae, mae, std_mae, mean_rmse, mean_std_rmse, rmse, pcc, keypoints):
+    pcc.to_csv(out_dir + '_pcc.csv')
 
-# out_name, mean_tot,std_tot, mean_tot_r, std_tot_r, mean_tot_l, std_tot_l
-def write_overall_results(out_name, mean_mae, std_mean_mae, mean_kps, std_kps, pcc_mean, pcc_std, mpjpe,pampjpe, accel):
-    print(os.path.basename(out_name), "\t\tMPJPE:",round(mpjpe*1000,3), "\tPA-MPJPE:",round(pampjpe*1000,3),"\tAccel:",round(accel*1000,3))
+# out_dir, mean_tot,std_tot, mean_tot_r, std_tot_r, mean_tot_l, std_tot_l
+def write_overall_results(out_dir, mean_mae, std_mean_mae, mean_kps, std_kps, pcc_mean, pcc_std, mpjpe,pampjpe, accel):
+    print(os.path.basename(out_dir), "\t\tMPJPE:",round(mpjpe*1000,3), "\tPA-MPJPE:",round(pampjpe*1000,3),"\tAccel:",round(accel*1000,3))
     df = pd.DataFrame([[mean_mae, std_mean_mae, pcc_mean, pcc_std, mean_kps.max(), mean_kps.min(), mpjpe,pampjpe, accel ]],  columns=['MAE:AVG', 'MAE:STD', 'PCC:MAE', 'PCC:STD', 'MAE:MAX','MAE:MIN','MPJPE','PAMPJPE', 'Accel'])
-    df.to_csv(out_name + '_overall.csv')
+    df.to_csv(out_dir + '_overall.csv')
 
 def pearson_cross_correlation_coordinates(ref, src):
     all_kp = find_common_keypoints_full(ref, src)
@@ -285,23 +285,23 @@ def load_file_pd(file_name):
     return pd.read_csv(file_name, delimiter=',')
 
 def main(args):
-    ref_name = args.ref[0]
-    src_name = args.src[0]
-    out_name = args.out[0]
-
-    ref = load_file_pd(ref_name)
-    src = load_file_pd(src_name)
-
-    ref, src = interpolation(ref,src)
-
-    keypoints = find_common_keypoints(ref,src)
-
-    distances = absolute_error_df(ref,src,keypoints)
-    accel = compute_error_accel(ref,src,keypoints)
-    mpjpe,pampjpe = calculate_mpjpe(ref,src,keypoints)
-    mean_tot, std_tot, mean_df, std_df, mpjpe_old = statistics(distances)
-    pcc = pearson_cross_correlation_coordinates(ref,src)
-    write_overall_results(out_name, mean_tot,std_tot, mean_df, std_df,float(pcc.mean()),float(pcc.std()), mpjpe, pampjpe, accel)    
+    ref_dir = args.ref[0]
+    src_dir = args.src[0]
+    out_dir = args.out[0]
+    list_values = []
+    for filename in os.listdir(src_dir):
+        print(filename)
+        f = os.path.join(src_dir, filename)
+        if os.path.isfile(f):
+            ref = load_file_pd(os.path.join(ref_dir, filename))
+            src = load_file_pd(f)
+            ref, src = interpolation(ref,src)
+            keypoints = find_common_keypoints(ref,src)
+            accel = compute_error_accel(ref,src,keypoints)
+            mpjpe,pampjpe = calculate_mpjpe(ref,src,keypoints)
+            list_values.append([mpjpe*1000,accel*1000])
+    #print(np.mean(np.array(list_values),axis=0))  
+    print(np.round(np.mean(np.array(list_values),axis=0),2))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="automatic skeletons analyzer", epilog="PARCOLAB")
@@ -310,20 +310,13 @@ if __name__ == '__main__':
                         dest="ref",
                         required=True,
                         nargs=1,
-                        help="path to the reference keypoints file")
+                        help="path to the reference keypoints files")
     parser.add_argument("--source",
                         "-s",
                         dest="src",
                         required=True,
                         nargs=1,
-                        help="path to the source keypoints file")
-    parser.add_argument("--lag",
-                        "-l",
-                        dest="lag",
-                        required=False,
-                        default='auto',
-                        nargs=1,
-                        help="set time shift")
+                        help="path to the source keypoints files")
     parser.add_argument("--out",
                         "-o",
                         dest="out",

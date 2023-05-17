@@ -1,5 +1,6 @@
+import sys,os
+sys.path.append(os.path.join(os.path.dirname(__file__),'..','utils'))
 import viewer
-import sys
 from timeit import default_timer as timer
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -64,8 +65,6 @@ def routine(table, time, names,delta):
     tot_time = round((pre_time+run_time+post_time),2)
     print("INFO:\tkps:",kps_num,"\tframes:",len(out),"\tdelay:", round(tot_time/len(out),3) ,"ms")    
     print("TIME ELAPSED:\tpre:",round(end_pre-start_pre,5)*1000,"ms\trun:",round(end_run-start_run,5)*1000,"ms\tpost:",round(end_post-start_post,5)*1000,"ms")
-    viewer.write_time(tot_time,pre_time,run_time,post_time,kps_num,len(out),input_path.replace("input","output/"+filter_name).replace(".csv","_time.csv"))
-
     return out
 
 # Parse argument if passed directly from viewer.py
@@ -73,17 +72,18 @@ def main():
     global input_path, filter_name
     delta = 2*int(sys.argv[3])
     filter_name = sys.argv[0].split('/')[-1].replace('.py','')
-    input_path = input_path=sys.argv[1]
-    import os
-    if not os.path.isdir(input_path.replace("input","output/"+filter_name).replace('.csv','')):
-      os.makedirs(input_path.replace("input","output/"+filter_name).replace('.csv',''))
+    input_path =sys.argv[1]
+    f = input_path.replace("input","output").replace(input_path.split('/')[-1],'')+filter_name
+    file_name =  sys.argv[1].split('/')[-1]
+    if not os.path.isdir(f):
+      os.makedirs(f)
     table, time, names = viewer.get_table(input_path)
     # ------------------------------------------------------------------------------------------------------------------
     table_out = routine(table, time, names,delta)
     # ------------------------------------------------------------------------------------------------------------------
-    output_path = input_path.replace("input","output/"+filter_name)
+    #output_path = input_path.replace("input","output/"+filter_name)
+    output_path = f+"/"+file_name
     viewer.write_table(output_path,table_out, time, names)
-    
 
 if __name__ == "__main__":
     main()

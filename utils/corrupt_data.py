@@ -1,16 +1,32 @@
+from operator import delitem
 import pandas as pd
 import argparse
+import os
+import numpy as np
+
+def add_gaussian_noise(tab,noise):
+    len = tab.shape[0]
+    for (index, column) in enumerate(tab):
+        if index > 0:
+            tab[column] += np.random.normal(0, 0.1, len)
+    return tab
 
 def main(args):
     src_name = args.src[0]
     out_name = args.out[0]
-    
-    src = pd.read_csv(src_name, delimiter=',')
-    
-    if args.mode == "denoising" :
-        dst = add_gaussian_noise(src)
-    elif args.mode == "completion":
-        dst = add_gaps(src)
+
+    for filename in os.listdir(src_name):    
+        f = os.path.join(src_name, filename)
+        if os.path.isfile(f):    
+            src = pd.read_csv(f, delimiter=',')
+            
+            if args.mode[0] == "denoising" :
+                
+                dst = add_gaussian_noise(src,float(args.gaussian[0]))
+                
+            elif args.mode[0] == "completion":
+                pass
+            dst.to_csv(os.path.join(out_name, filename),index=False)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare the data for being corrupted", epilog="PARCOLAB")
@@ -33,11 +49,11 @@ if __name__ == "__main__":
                         nargs=1,
                         help="path of output files")
     parser.add_argument("--gaussian_noise",
-                        "-c",
-                        dest="side",
+                        "-g",
+                        dest="gaussian",
                         required=False,
                         nargs=1,
-                        default='15',
+                        default='0',    
                         help="")
     args = parser.parse_args()
     main(args)
