@@ -136,46 +136,46 @@ This repository includes implementation codes or links to the authors’ origina
     <td>Interpolation</td>
     <td>-</td>
     <td>-</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>0.02</td>
+    <td>0.09</td>
+    <td>162.18</td>
+    <td>350.38</td>
   </tr>
   <tr>
     <td>KF0</td>
     <td>64.81</td>
     <td>49.96</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>28.97</td>
+    <td>2.14</td>
+    <td>67.01</td>
+    <td>49.45</td>
   </tr>
   <tr>
     <td>KF1</td>
     <td>64.28</td>
     <td>53.73</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>24.24</td>
+    <td>2.02</td>
+    <td>66.42</td>
+    <td>53.26</td>
   </tr>
   <tr>
     <td>KF2</td>
     <td>65.8</td>
     <td>56.52</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>22.67</td>
+    <td>2.03</td>
+    <td>68.05</td>
+    <td>56.14</td>
   </tr>
   <tr>
     <td>T-SVD</td>
     <td>111.42</td>
     <td>106.33</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
   </tr>
     <tr>
     <td>PCA</td>
@@ -188,12 +188,12 @@ This repository includes implementation codes or links to the authors’ origina
   </tr>
   <tr>
     <td>KF+DE</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>131.9</td>
+    <td>185.76</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
   </tr>
     <tr>
     <td></td>

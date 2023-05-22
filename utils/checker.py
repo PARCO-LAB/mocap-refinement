@@ -188,7 +188,7 @@ def calculate_mpjpe(ref, src,kps):
         S[:,i,2] = src[kps[i]+':Z'].values
     
     mpjpe = np.mean(np.sqrt(np.sum(np.square(S-R), axis=2)))
-
+    """
     pampjpe = np.zeros([N, len(kps)])
 
     for n in range(N):
@@ -199,10 +199,9 @@ def calculate_mpjpe(ref, src,kps):
         pampjpe[n] = np.sqrt(np.sum(np.square(frame_pred - frame_gt), axis=1))
 
     pampjpe = np.mean(pampjpe)
+    """
 
-
-
-    return mpjpe,pampjpe
+    return mpjpe,mpjpe
 
 def statistics(df):
     df.drop('time',axis=1, inplace=True, errors='ignore')
@@ -290,18 +289,18 @@ def main(args):
     out_dir = args.out[0]
     list_values = []
     for filename in os.listdir(src_dir):
-        print(filename)
         f = os.path.join(src_dir, filename)
         if os.path.isfile(f):
             ref = load_file_pd(os.path.join(ref_dir, filename))
             src = load_file_pd(f)
             ref, src = interpolation(ref,src)
             keypoints = find_common_keypoints(ref,src)
-            print(keypoints)
             accel = compute_error_accel(ref,src,keypoints)
             mpjpe,pampjpe = calculate_mpjpe(ref,src,keypoints)
             list_values.append([mpjpe*1000,accel*1000])
+            print(filename,[mpjpe*1000,accel*1000])
     print(np.round(np.mean(np.array(list_values),axis=0),2))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="automatic skeletons analyzer", epilog="PARCOLAB")

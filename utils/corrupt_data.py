@@ -21,7 +21,7 @@ def add_gaps(tab):
     n_keypoints = tab_copy.shape[1] // 3
     
     # Genera indici casuali per le coordinate dei keypoints
-    random_frames = np.random.choice(np.arange(n_frames), size=(round(n_frames/3)), replace=True)
+    random_frames = np.random.choice(np.arange(1,n_frames-1), size=(round(n_frames/3)), replace=True)
     random_indices = np.random.choice(np.arange(n_keypoints), size=(round(n_frames/3), round(n_keypoints/3)), replace=True)
     
     # Inserisce valori NaN casuali nelle coordinate dei keypoints
