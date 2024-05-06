@@ -36,7 +36,7 @@ This repository includes implementation codes or links to the authors’ origina
 
 ### Neural Networks
 - 🔗 Autoencoder ([Smoothnet](https://github.com/cure-lab/SmoothNet) - SN)
-
+- 🔗 [FLK](https://github.com/PARCO-LAB/FLK)
 ### Hybrid Approaches
 - ✅ Kalman Filter + Differential Evolutionary ([Das2017](https://ieeexplore.ieee.org/document/7996969) - KF+DE)
 
