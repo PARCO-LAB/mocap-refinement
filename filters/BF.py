@@ -1,6 +1,5 @@
 import sys,os
 sys.path.append(os.path.join(os.path.dirname(__file__),'..','utils'))
-import viewer
 from timeit import default_timer as timer
 import numpy as np
 from scipy.signal import butter, filtfilt
@@ -39,8 +38,7 @@ def post_process():
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
-def routine(table, time, names, fs, delta):
-    
+def routine(table, delta):
     
     # Pre-process phase
     start_pre = timer()
@@ -48,7 +46,7 @@ def routine(table, time, names, fs, delta):
     out = table
     lowcut = 2
     order = 3
-    b,a = pre_process(lowcut,fs,order)
+    b,a = pre_process(lowcut,30,order)
     
     # ------------------------------------------------------------------------------------------------------------------
     end_pre = timer()
@@ -57,11 +55,20 @@ def routine(table, time, names, fs, delta):
     # Runtime phase
     start_run = timer()
     # ------------------------------------------------------------------------------------------------------------------
+    # for i in range(0,(table.shape[0] - table.shape[0] % delta), delta):
+    #     out.iloc[i:i+delta] = BF((table.iloc[i:i+delta].values), lowcut, 30, order,b,a)
+    # out.iloc[table.shape[0]-table.shape[0]%delta:table.shape[0]] = table.iloc[table.shape[0]-table.shape[0] % delta:table.shape[0]]
     
-    for i in range(0,(len(time) - len(time) % delta), delta):
-        out[i:i+delta] = BF((table[i:i+delta]), lowcut, fs, order,b,a)
-    # out[len(time)-len(time)%delta:len(time)] = BF((table[len(time)-len(time)%delta:len(time)]), lowcut, fs, order,b,a)
-    out[len(time)-len(time)%delta:len(time)] = table[len(time)-len(time)%delta:len(time)]
+    for i in range(0,table.shape[0]):
+        if i < delta:
+            pass
+        else:
+            out.iloc[i-delta+1:i+1] = np.array(BF((table.iloc[i-delta+1:i+1].values), lowcut, 30, order,b,a))
+            # out.iloc[i,:] = seq[-1,:]
+    
+    # for i in range(0,(table.shape[0] - table.shape[0] % delta), delta):
+    #     out.iloc[i:i+delta] = BF((table.iloc[i:i+delta].values), lowcut, 30, order,b,a)
+    # out.iloc[table.shape[0]-table.shape[0]%delta:table.shape[0]] = table.iloc[table.shape[0]-table.shape[0] % delta:table.shape[0]]
     # ------------------------------------------------------------------------------------------------------------------
     end_run = timer()
 
@@ -73,7 +80,7 @@ def routine(table, time, names, fs, delta):
     # ------------------------------------------------------------------------------------------------------------------
     end_post = timer()
 
-    kps_num = int((len(names)-1)/3)
+    kps_num = int(table.shape[1]/3)
     pre_time = round(end_pre-start_pre,5)*1000
     run_time = round(end_run-start_run,5)*1000
     post_time = round(end_post-start_post,5)*1000
@@ -83,26 +90,33 @@ def routine(table, time, names, fs, delta):
     
     return out
 
+
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('filter_name')
+parser.add_argument('input_path')
+parser.add_argument('output_path')
+parser.add_argument('delta')
+
+args = parser.parse_args()
+
 # Parse argument if passed directly from viewer.py
 def main():
-    global input_path, filter_name
-    fs = float(sys.argv[2])
-    delta = 2*int(sys.argv[3])
-    filter_name = sys.argv[0].split('/')[-1].replace('.py','')
-    input_path =sys.argv[1]
-    f = input_path.replace("input","output").replace(input_path.split('/')[-1],'')+filter_name
-    file_name =  sys.argv[1].split('/')[-1]
+    delta = int(args.delta)
+    filter_name = args.filter_name
+    input_path = args.input_path
+    f = args.output_path + filter_name
+    file_name =  input_path.split('/')[-1]
     if not os.path.isdir(f):
       os.makedirs(f)
-    table, time, names = viewer.get_table(input_path)
+    
     # ------------------------------------------------------------------------------------------------------------------
-    table_out = routine(table, time, names,fs,delta)
+    table_out = routine(pd.read_csv(input_path),delta)
     # ------------------------------------------------------------------------------------------------------------------
-    #output_path = input_path.replace("input","output/"+filter_name)
-    output_path = f+"/"+file_name
-    viewer.write_table(output_path,table_out, time, names)
-
-
+    output_path = os.path.join(f,file_name)
+    table_out.to_csv(output_path)
 
 if __name__ == "__main__":
     main()

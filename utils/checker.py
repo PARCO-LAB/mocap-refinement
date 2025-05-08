@@ -40,7 +40,7 @@ def pearson_cross_correlation_coordinates(ref, src):
     return pcc
 
 def root_mean_square_error(df):
-    df.drop('time',axis=1, inplace=True, errors='ignore')
+    # df.drop('time',axis=1, inplace=True, errors='ignore')
     rmse_df = pd.DataFrame()
     mean_df = df.mean()
     df = pd.DataFrame(columns = df.columns)
@@ -204,7 +204,7 @@ def calculate_mpjpe(ref, src,kps):
     return mpjpe,mpjpe
 
 def statistics(df):
-    df.drop('time',axis=1, inplace=True, errors='ignore')
+    # df.drop('time',axis=1, inplace=True, errors='ignore')
     mean_df = df.mean()
     std_df = df.std()
     mean_df.name = "mean"
@@ -286,20 +286,20 @@ def load_file_pd(file_name):
 def main(args):
     ref_dir = args.ref[0]
     src_dir = args.src[0]
-    out_dir = args.out[0]
+    out_file = args.out[0]
     list_values = []
     for filename in os.listdir(src_dir):
         f = os.path.join(src_dir, filename)
         if os.path.isfile(f):
             ref = load_file_pd(os.path.join(ref_dir, filename))
             src = load_file_pd(f)
-            ref, src = interpolation(ref,src)
             keypoints = find_common_keypoints(ref,src)
             accel = compute_error_accel(ref,src,keypoints)
             mpjpe,pampjpe = calculate_mpjpe(ref,src,keypoints)
             list_values.append([mpjpe*1000,accel*1000])
-            print(filename,[mpjpe*1000,accel*1000])
+            print(filename,[float(mpjpe*1000),float(accel*1000)])
     print(np.round(np.mean(np.array(list_values),axis=0),2))
+    pd.DataFrame(data=np.array(list_values),columns=["MPJPE","Accel"]).to_csv(out_file,index=False)
 
 
 if __name__ == '__main__':

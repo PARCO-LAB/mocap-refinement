@@ -1,8 +1,15 @@
 #!/bin/bash
-# Usage: bash test.sh <FILTER_NAME> <input_directory> <output_directory> <reference_directory> <frequency> <temporal_window>
+i=0
+max=4
 for FILE in $2*; do 
     echo $FILE
-    python3 filters/$1.py $FILE $4 $5
+    # python3 filters/$1.py $1 $FILE $3 $5 $6 &
+    python3 filters/$1.py $1 $FILE $3 $5 &
+    ((i++))
+    if [ $i -gt $max ]; then
+        wait
+        i=0
+    fi
 done
-
-python3 utils/checker.py -r $3 -s "${2/"input"/"output"}"$1"/" -o tmp/
+wait
+python3 utils/checker.py -r $4 -s $3$1/ -o $3$1.csv
