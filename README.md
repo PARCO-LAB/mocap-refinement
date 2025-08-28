@@ -8,7 +8,7 @@ This repository includes implementation codes of filtering methods for denoising
   <img src="./media/taxonomy.png" />
 </p> -->
 <p align="center">
-  <img src="./media/general_purpose.gif" />
+  <img src="./media/front.gif" />
 </p>
 
 
