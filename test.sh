@@ -3,7 +3,6 @@ i=0
 max=4
 for FILE in $2*; do 
     echo $FILE
-    # python3 filters/$1.py $1 $FILE $3 $5 $6 &
     python3 filters/$1.py $1 $FILE $3 $5 &
     ((i++))
     if [ $i -gt $max ]; then
